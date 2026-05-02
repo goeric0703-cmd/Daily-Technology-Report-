@@ -1,0 +1,35 @@
+name: Daily Tech News Pusher
+
+# 设定触发条件
+on:
+  schedule:
+    # 这里的每天早上 8 点 (北京时间)，对应 UTC 时间是 0 点
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 允许你随时手动点击运行
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    
+    # 赋予这个任务写入 Issues 的权限
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: 获取仓库代码
+        uses: actions/checkout@v3
+
+      - name: 安装 Python 环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 安装依赖包
+        run: pip install -r requirements.txt
+
+      - name: 运行推送脚本
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python main.py
+
